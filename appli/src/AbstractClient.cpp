@@ -1,7 +1,7 @@
 #include "AbstractClient.h"
+using bank2::extension::client::AbstractClient;
 
 namespace bank2::extension::client {
-
 AbstractClient::AbstractClient(int arrivalTime, std::unique_ptr<AbstractOperation> operation, int patienceTime)
     : arrivalTime(arrivalTime), operation(std::move(operation)), patienceTime(patienceTime),
       serviceStartTime(0), departureTime(0) {}

@@ -12,7 +12,7 @@ namespace bank2::extension::simulation {
    
 class Simulation {
 private:
-    Bank bank;
+    bank2::extension::bank::Bank bank;  // Qualification complète du type Bank
     StatisticManager statisticManager;
     const SimulationEntry simulationEntry;
 

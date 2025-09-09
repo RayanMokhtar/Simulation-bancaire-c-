@@ -3,6 +3,8 @@
 #include "VIPClient.h"
 #include "SimulationUtility.h"
 #include <iostream>
+using bank2::extension::client::AbstractClient;
+using bank2::extension::bank::Bank;
 
 namespace bank2::extension::simulation {
 
@@ -65,10 +67,11 @@ void Simulation::updateBank(int time) {
     }
 }
 
-void Simulation::serveClient(int time,  bank2::extension::bank::Cashier& cashier, std::unique_ptr<AbstractClient> client) {
+void Simulation::serveClient(int time, bank2::extension::bank::Cashier& cashier, std::unique_ptr<AbstractClient> client) {
     client->setServiceStartTime(time);
-    cashier.serve(std::move(client));
-    printServiceTimeTrace(time, client->getOperation().getServiceTime());
+    int serviceTime = client->getOperation().getServiceTime();  // Obtenir la valeur AVANT le déplacement.
+    cashier.serve(std::move(client));  // Maintenant, déplacer en toute sécurité.
+    printServiceTimeTrace(time, serviceTime);  // Utiliser la valeur stockée.
 }
 
 int Simulation::generateRandomServiceTime() {

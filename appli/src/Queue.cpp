@@ -1,5 +1,6 @@
 #include "Queue.h"
 #include <algorithm>
+using bank2::extension::client::AbstractClient;
 
 namespace bank2::extension::bank {
 

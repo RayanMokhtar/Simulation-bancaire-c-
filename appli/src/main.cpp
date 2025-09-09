@@ -1,6 +1,8 @@
 #include "Simulation.h"
 #include "SimulationEntry.h"
 #include <iostream>
+using bank2::extension::client::AbstractClient;
+using bank2::extension::bank::Bank;
 
 int main() {
     const int CLIENT_ARRIVAL_INTERVAL = 5;

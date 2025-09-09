@@ -1,6 +1,10 @@
 #include "Bank.h"
+using bank2::extension::client::AbstractClient;
+using bank2::extension::bank::Bank;
+
 
 namespace bank2::extension::bank {
+// En haut de vos fichiers d'implémentation (.cpp)
 
 Bank::Bank(int cashierCount) {
     for (int i = 0; i < cashierCount; ++i) {

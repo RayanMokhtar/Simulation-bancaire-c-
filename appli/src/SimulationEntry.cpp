@@ -1,5 +1,6 @@
 #include "SimulationEntry.h"
 
+
 namespace bank2::extension::simulation {
 
 SimulationEntry::SimulationEntry(int simDur, int cashCnt, int minServ, int maxServ, int arrInt, double priRate, int patTime)

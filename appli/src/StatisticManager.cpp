@@ -1,4 +1,6 @@
 #include "StatisticManager.h"
+using bank2::extension::client::AbstractClient;
+
 
 namespace bank2::extension::simulation {
 

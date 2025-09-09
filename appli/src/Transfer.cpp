@@ -1,4 +1,6 @@
 #include "Transfer.h"
+using bank2::extension::client::AbstractOperation;
+
 
 namespace bank2::extension::client {
 

@@ -4,6 +4,8 @@
 #include "Withdraw.h"
 #include <iostream>
 
+using bank2::extension::client::AbstractClient;
+using bank2::extension::bank::Bank;
 
 namespace bank2::extension::simulation {
 
