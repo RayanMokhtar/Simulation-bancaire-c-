@@ -4,8 +4,12 @@
 #include <windows.h>
 #include <string>
 #include <memory>
-#include "../include/SimulationNew.h"
-#include "../include/SimulationEntry.h"
+#include "simulation/SimulationNew.h"
+#include "simulation/SimulationEntry.h"
+
+#ifdef WITH_PERSISTENCE
+#include "persistence/PersistenceManager.h"
+#endif
 
 class WindowsGUI {
 private:
@@ -20,6 +24,12 @@ private:
     bool isRunning;
     int currentTime;
     int maxTime;
+
+#ifdef WITH_PERSISTENCE
+    std::unique_ptr<PersistenceManager> persistenceManager;
+    bool persistenceEnabled;
+    HWND hSaveConfig, hLoadConfig, hShowHistory;
+#endif
 
 public:
     WindowsGUI();
