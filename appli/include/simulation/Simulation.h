@@ -19,8 +19,10 @@ public:
     void updateBank(int currentSystemTime);
     void serveClient(int currentSystemTime, Cashier* cashier, std::shared_ptr<AbstractClient> client);  // Changé en shared_ptr
     int generateRandomServiceTime();
+    StatisticManager& getStatisticManager();  // Retourne une référence au StatisticManager
     bool newClientArrival(int clientArrivalInterval, int simIter);
     std::string simulationResults();
+    const std::vector<std::unique_ptr<Cashier>>& getCashiers() const;  // Méthode pour accéder aux caissiers
 };
 
 #endif // SIMULATION_H

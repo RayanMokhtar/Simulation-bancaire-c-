@@ -88,6 +88,10 @@ bool Simulation::newClientArrival(int clientArrivalInterval, int simIter) {
     return simIter % clientArrivalInterval == 0;
 }
 
+StatisticManager& Simulation::getStatisticManager() {
+    return *statisticManager;  
+}
+
 std::string Simulation::simulationResults() {
     std::string results = "########## Simulation results : #####################\n";
     results += "Simulation Duration : " + std::to_string(simulationEntry.getSimulationDuration()) + "\n";
@@ -98,4 +102,8 @@ std::string Simulation::simulationResults() {
     results += "Non-Served client count : " + std::to_string(statisticManager->nonServedClientCount()) + "\n";
     results += "Client satisfaction rate : " + std::to_string(statisticManager->calculateClientSatisfactionRate()) + " %";
     return results;
+}
+
+const std::vector<std::unique_ptr<Cashier>>& Simulation::getCashiers() const {
+    return bank->getCashiers();  // Accède aux caissiers via bank
 }

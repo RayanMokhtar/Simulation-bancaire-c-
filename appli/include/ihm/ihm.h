@@ -60,7 +60,8 @@ public:
     std::vector<ClientDataIHM> getFileAttenteIHM() const;
     std::vector<CaissierIHM> getCaissiersIHM() const;
     int getTempsActuel() const { return tempsActuel; }
-    std::string getSimulationResults() const;  // Appelle simulationResults() si possible
+    std::string getSimulationResults() const; 
+    void displayGraphs(int totalServed, int totalDeparted, const std::map<int, double>& occupancyData);  // Nouvelle déclaration
 };
 
 #endif // IHM_H
