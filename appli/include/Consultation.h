@@ -3,8 +3,6 @@
 
 #include "AbstractOperation.h"
 
-namespace bank2::extension::client {
-
 class Consultation : public AbstractOperation {
 public:
     Consultation(int serviceTime);
@@ -12,6 +10,5 @@ public:
     std::string toString() const override;
 };
 
-} // namespace bank2::extension::client
 
 #endif // CONSULTATION_H

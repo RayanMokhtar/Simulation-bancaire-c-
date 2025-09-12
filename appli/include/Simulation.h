@@ -7,25 +7,20 @@
 #include "StatisticManager.h"
 #include "SimulationEntry.h"
 
-namespace bank2::extension::simulation {
-
-   
 class Simulation {
 private:
-    bank2::extension::bank::Bank bank;  // Qualification complète du type Bank
-    StatisticManager statisticManager;
+    std::unique_ptr<Bank> bank;  // Changé en unique_ptr
+    std::unique_ptr<StatisticManager> statisticManager;  // Changé en unique_ptr
     const SimulationEntry simulationEntry;
 
 public:
-    Simulation(const SimulationEntry& entry);
+    Simulation(const SimulationEntry& simulationEntry);
     void simulate();
-    void updateBank(int time);  // Ajout
-    void serveClient(int time,  bank2::extension::bank::Cashier& cashier, std::unique_ptr<AbstractClient> client);  // Ajout
-    int generateRandomServiceTime();  // Ajout
-    bool newClientArrival(int interval, int simIter);  // Ajout
-    std::string simulationResults() const;
+    void updateBank(int currentSystemTime);
+    void serveClient(int currentSystemTime, Cashier* cashier, std::shared_ptr<AbstractClient> client);  // Changé en shared_ptr
+    int generateRandomServiceTime();
+    bool newClientArrival(int clientArrivalInterval, int simIter);
+    std::string simulationResults();
 };
-
-} // namespace bank2::extension::simulation
 
 #endif // SIMULATION_H

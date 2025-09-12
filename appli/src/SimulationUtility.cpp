@@ -4,14 +4,6 @@
 #include "Withdraw.h"
 #include <iostream>
 
-using bank2::extension::client::AbstractClient;
-using bank2::extension::bank::Bank;
-
-namespace bank2::extension::simulation {
-
-using bank2::extension::client::Transfer;  
-using bank2::extension::client::Withdraw; 
-using bank2::extension::client::Consultation; 
 
 std::mt19937 gen(std::random_device{}());
 
@@ -60,4 +52,3 @@ std::unique_ptr<AbstractOperation> getRandomOperation(int serviceTime) {
     }
 }
 
-} // namespace bank2::extension::simulation

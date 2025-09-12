@@ -1,7 +1,5 @@
 #include "AbstractClient.h"
-using bank2::extension::client::AbstractClient;
 
-namespace bank2::extension::client {
 AbstractClient::AbstractClient(int arrivalTime, std::unique_ptr<AbstractOperation> operation, int patienceTime)
     : arrivalTime(arrivalTime), operation(std::move(operation)), patienceTime(patienceTime),
       serviceStartTime(0), departureTime(0) {}
@@ -18,4 +16,3 @@ std::string AbstractClient::toString() const {
     return "Client[arrival: " + std::to_string(arrivalTime) + ", patience time: " + std::to_string(patienceTime) + ", " + operation->toString() + "]";
 }
 
-} // namespace bank2::extension::client

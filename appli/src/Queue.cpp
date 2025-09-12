@@ -1,40 +1,40 @@
+// filepath: c:\Users\mokht\Desktop\cpp\Simulation-bancaire-c-\appli\src\Queue.cpp
 #include "Queue.h"
 #include <algorithm>
-using bank2::extension::client::AbstractClient;
-
-namespace bank2::extension::bank {
 
 bool Queue::isEmpty() const { return clients.empty(); }
 
-void Queue::addQueueLast(std::unique_ptr<AbstractClient> client) { clients.push_back(std::move(client)); }
+void Queue::addQueueLast(std::shared_ptr<AbstractClient> client) { clients.push_back(client); }
 
-std::unique_ptr<AbstractClient> Queue::getQueueFirst() {
-    auto client = std::move(clients.front());
-    clients.pop_front();
-    return client;
-}
-
-AbstractClient* Queue::findPriorityClient() const {
-    for (const auto& client : clients) {
-        if (client->isPriority()) return client.get();
+std::shared_ptr<AbstractClient> Queue::getQueueFirst() {
+    if (!clients.empty()) {
+        auto client = clients.front();
+        clients.pop_front();
+        return client;
     }
     return nullptr;
 }
 
-void Queue::removePriorityClient(AbstractClient* client) {
-    clients.erase(std::remove_if(clients.begin(), clients.end(),
-        [client](const std::unique_ptr<AbstractClient>& c) { return c.get() == client; }), clients.end());
+std::shared_ptr<AbstractClient> Queue::findPriorityClient() const {
+    for (const auto& client : clients) {
+        if (client->isPriority()) return client;
+    }
+    return nullptr;
+}
+
+void Queue::removePriorityClient(std::shared_ptr<AbstractClient> client) {
+    clients.erase(std::remove(clients.begin(), clients.end(), client), clients.end());
 }
 
 void Queue::updateClientPatience() {
     for (auto& client : clients) client->reducePatience();
 }
 
-std::vector<std::unique_ptr<AbstractClient>> Queue::removeImpatientClients() {
-    std::vector<std::unique_ptr<AbstractClient>> removeList;
+std::vector<std::shared_ptr<AbstractClient>> Queue::removeImpatientClients() {
+    std::vector<std::shared_ptr<AbstractClient>> removeList;
     for (auto it = clients.begin(); it != clients.end(); ) {
         if (!(*it)->isPatient()) {
-            removeList.push_back(std::move(*it));
+            removeList.push_back(*it);
             it = clients.erase(it);
         } else ++it;
     }
@@ -48,5 +48,3 @@ std::string Queue::toString() const {
     }
     return result;
 }
-
-} // namespace bank2::extension::bank

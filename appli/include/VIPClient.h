@@ -3,7 +3,7 @@
 
 #include "AbstractClient.h"
 
-namespace bank2::extension::client {
+
 
 class VIPClient : public AbstractClient {
 public:
@@ -12,6 +12,5 @@ public:
     std::string toString() const override;
 };
 
-} // namespace bank2::extension::client
 
 #endif // VIP_CLIENT_H

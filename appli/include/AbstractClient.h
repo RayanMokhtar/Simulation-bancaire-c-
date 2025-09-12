@@ -5,7 +5,6 @@
 #include <string>
 #include "AbstractOperation.h"
 
-namespace bank2::extension::client {
 
 class AbstractClient {
 protected:
@@ -31,6 +30,6 @@ public:
     virtual std::string toString() const;
 };
 
-} // namespace bank2::extension::client
+
 
 #endif // ABSTRACT_CLIENT_H

@@ -3,7 +3,6 @@
 
 #include "AbstractOperation.h"
 
-namespace bank2::extension::client {
 
 class Transfer : public AbstractOperation {
 public:
@@ -12,6 +11,5 @@ public:
     std::string toString() const override;
 };
 
-} // namespace bank2::extension::client
 
 #endif // TRANSFER_H

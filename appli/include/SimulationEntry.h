@@ -1,7 +1,6 @@
 #ifndef SIMULATION_ENTRY_H
 #define SIMULATION_ENTRY_H
 
-namespace bank2::extension::simulation {
 
 class SimulationEntry {
 private:
@@ -24,6 +23,5 @@ public:
     int getClientPatienceTime() const;
 };
 
-} // namespace bank2::extension::simulation
 
 #endif // SIMULATION_ENTRY_H

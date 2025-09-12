@@ -1,13 +1,12 @@
+// filepath: c:\Users\mokht\Desktop\cpp\Simulation-bancaire-c-\appli\include\Bank.h
 #ifndef BANK_H
 #define BANK_H
 
-#include <memory>
-#include <string>
 #include <vector>
+#include <string>
+#include <memory>
 #include "Cashier.h"
 #include "Queue.h"
-
-namespace bank2::extension::bank {
 
 class Bank {
 private:
@@ -21,7 +20,5 @@ public:
     Cashier* getFreeCashier();
     std::string toString() const;
 };
-
-} // namespace bank2::extension::bank
 
 #endif // BANK_H

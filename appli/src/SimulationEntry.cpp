@@ -1,7 +1,6 @@
 #include "SimulationEntry.h"
 
 
-namespace bank2::extension::simulation {
 
 SimulationEntry::SimulationEntry(int simDur, int cashCnt, int minServ, int maxServ, int arrInt, double priRate, int patTime)
     : simulationDuration(simDur), cashierCount(cashCnt), minServiceTime(minServ), maxServiceTime(maxServ),
@@ -15,4 +14,3 @@ int SimulationEntry::getClientArrivalInterval() const { return clientArrivalInte
 double SimulationEntry::getPriorityClientRate() const { return priorityClientRate; }
 int SimulationEntry::getClientPatienceTime() const { return clientPatienceTime; }
 
-} // namespace bank2::extension::simulation

@@ -3,7 +3,6 @@
 
 #include "AbstractClient.h"
 
-namespace bank2::extension::client {
 
 class Client : public AbstractClient {
 public:
@@ -11,6 +10,5 @@ public:
     bool isPriority() const override;
 };
 
-} // namespace bank2::extension::client
 
 #endif // CLIENT_H

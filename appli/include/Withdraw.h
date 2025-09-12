@@ -3,7 +3,6 @@
 
 #include "AbstractOperation.h"
 
-namespace bank2::extension::client {
 
 class Withdraw : public AbstractOperation {
 public:
@@ -12,6 +11,5 @@ public:
     std::string toString() const override;
 };
 
-} // namespace bank2::extension::client
 
 #endif // WITHDRAW_H

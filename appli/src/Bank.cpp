@@ -1,14 +1,9 @@
+// filepath: c:\Users\mokht\Desktop\cpp\Simulation-bancaire-c-\appli\src\Bank.cpp
 #include "Bank.h"
-using bank2::extension::client::AbstractClient;
-using bank2::extension::bank::Bank;
-
-
-namespace bank2::extension::bank {
-// En haut de vos fichiers d'implémentation (.cpp)
 
 Bank::Bank(int cashierCount) {
     for (int i = 0; i < cashierCount; ++i) {
-        cashiers.emplace_back(std::make_unique<Cashier>());
+        cashiers.push_back(std::make_unique<Cashier>());
     }
 }
 
@@ -17,7 +12,7 @@ const std::vector<std::unique_ptr<Cashier>>& Bank::getCashiers() const { return 
 Queue& Bank::getQueue() { return queue; }
 
 Cashier* Bank::getFreeCashier() {
-    for (auto& cashier : cashiers) {
+    for (const auto& cashier : cashiers) {
         if (cashier->isFree()) return cashier.get();
     }
     return nullptr;
@@ -30,5 +25,3 @@ std::string Bank::toString() const {
     }
     return result;
 }
-
-} // namespace bank2::extension::bank

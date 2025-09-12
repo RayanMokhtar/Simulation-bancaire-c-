@@ -3,7 +3,6 @@
 
 #include <string>
 
-namespace bank2::extension::client {
 
 class AbstractOperation {
 protected:
@@ -17,7 +16,5 @@ public:
     virtual bool isUrgent() const = 0;
     virtual std::string toString() const = 0;
 };
-
-} // namespace bank2::extension::client
 
 #endif // ABSTRACT_OPERATION_H

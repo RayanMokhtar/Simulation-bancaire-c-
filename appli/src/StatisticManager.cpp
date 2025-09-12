@@ -1,15 +1,11 @@
 #include "StatisticManager.h"
-using bank2::extension::client::AbstractClient;
 
-
-namespace bank2::extension::simulation {
-
-void StatisticManager::registerServedClient(std::unique_ptr<AbstractClient> client) {
-    servedClients.push_back(std::move(client));
+void StatisticManager::registerServedClient(std::shared_ptr<AbstractClient> client) {
+    servedClients.push_back(client);  // Maintenant compatible
 }
 
-void StatisticManager::registerNonServedClient(std::unique_ptr<AbstractClient> client) {
-    nonServedClients.push_back(std::move(client));
+void StatisticManager::registerNonServedClient(std::shared_ptr<AbstractClient> client) {
+    nonServedClients.push_back(client);  // Maintenant compatible
 }
 
 void StatisticManager::simulationDurationRecord() { ++simulationDuration; }
@@ -21,6 +17,7 @@ double StatisticManager::calculateAverageCashierOccupationRate(int cashierCount)
 }
 
 double StatisticManager::calculateAverageClientWaitingTime() const {
+    if (servedClients.empty()) return 0.0;
     int total = 0;
     for (const auto& client : servedClients) {
         total += client->getServiceStartTime() - client->getArrivalTime();
@@ -29,6 +26,7 @@ double StatisticManager::calculateAverageClientWaitingTime() const {
 }
 
 double StatisticManager::calculateAverageClientServiceTime() const {
+    if (servedClients.empty()) return 0.0;  // Évite division par zéro
     int total = 0;
     for (const auto& client : servedClients) {
         total += client->getDepartureTime() - client->getServiceStartTime();
@@ -41,7 +39,8 @@ int StatisticManager::servedClientCount() const { return servedClients.size(); }
 int StatisticManager::nonServedClientCount() const { return nonServedClients.size(); }
 
 double StatisticManager::calculateClientSatisfactionRate() const {
-    return servedClientCount() * 100.0 / (servedClientCount() + nonServedClientCount());
+    int total = servedClientCount() + nonServedClientCount();
+    if (total == 0) return 0.0;
+    return servedClientCount() * 100.0 / total;
 }
 
-} // namespace bank2::extension::simulation
