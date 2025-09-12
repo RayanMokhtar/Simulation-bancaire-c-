@@ -5,6 +5,9 @@
 #include <memory>
 #include <cmath>
 #include <SFML/Graphics.hpp>
+// Ajouts pour gestion de chemins de polices multiplateforme
+#include <vector>
+#include <string>
 
 #include "ihm/ihm.h"
 #include "client/Client.h"
@@ -28,23 +31,59 @@ static const sf::Color COL_VIREMENT(155, 89, 182);  // virement (maintenant pour
 static const sf::Color COL_RETRAIT(26, 188, 156);   // retrait (maintenant pour Withdraw)
 static const sf::Color COL_VIP(241, 196, 15);       // VIP
 
-//ubuntu ttf marche ici ... 
+// Chargement robuste d'une police pour l'IHM (Windows, Linux, puis locaux)
 static bool loadUiFont(sf::Font &font) {
+#ifdef _WIN32
+    // Chemins typiques des polices sous Windows (on récupère %WINDIR%)
+    const char* envWindir = std::getenv("WINDIR");
+    std::string win = envWindir ? envWindir : "C:\\Windows";
+    const std::vector<std::string> windowsCandidates = {
+        win + "\\Fonts\\segoeui.ttf",   // Segoe UI (par défaut Windows)
+        win + "\\Fonts\\arial.ttf",     // Arial
+        win + "\\Fonts\\tahoma.ttf",    // Tahoma
+        win + "\\Fonts\\verdana.ttf",   // Verdana
+        win + "\\Fonts\\calibri.ttf",   // Calibri
+        win + "\\Fonts\\consola.ttf"    // Consolas
+    };
+    for (const auto& path : windowsCandidates) {
+        if (font.loadFromFile(path)) {
+            std::cout << "Police chargée: " << path << std::endl;
+            return true;
+        }
+    }
+#endif
+
+    // Chemins typiques Linux
     const char* linuxCandidates[] = {
         "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",  // Liberation Sans
-        "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",            // Ubuntu
-        "/usr/share/fonts/truetype/freefont/FreeSans.ttf",          
+        "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",                    // Ubuntu
+        "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
         "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",        // DejaVu Sans
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",                  // DejaVu Sans
     };
     for (auto path : linuxCandidates) {
         if (font.loadFromFile(path)) {
-            std::cout << "police chemin fonctionnel :path" << path << std::endl;
+            std::cout << "Police chargée: " << path << std::endl;
             return true;
         }
     }
 
-    return false;  // Aucune police trouvée, texte ne s'affichera pas
+    // Fallbacks éventuels dans le projet (si vous ajoutez une police locale)
+    const char* localCandidates[] = {
+        "assets/fonts/DejaVuSans.ttf",
+        "assets/DejaVuSans.ttf",
+        "resources/fonts/DejaVuSans.ttf",
+        "fonts/DejaVuSans.ttf"
+    };
+    for (auto path : localCandidates) {
+        if (font.loadFromFile(path)) {
+            std::cout << "Police chargée (locale): " << path << std::endl;
+            return true;
+        }
+    }
+
+    std::cout << "Aucune police trouvée. Le texte ne s'affichera pas." << std::endl;
+    return false;  // Aucun chemin trouvé
 }
 
 // Crée un texte prêt à dessiner
@@ -119,7 +158,7 @@ static void drawClientIcon(sf::RenderWindow& window, const sf::Font* font, const
     if (demande == "Operation: Transfer") base = COL_VIREMENT;  // Violet pour Transfer
     else if (demande == "Operation: Withdraw") base = COL_RETRAIT;  // Vert pour Withdraw
     else base = COL_CONSULT;  // Bleu pour Consultation
-    std::cout << "Demande: " << demande << " -> Couleur: " << base.r << "," << base.g << "," << base.b << std::endl;
+
     sf::CircleShape bubble(20.f);
     bubble.setFillColor(base);
     bubble.setPosition(pos);
@@ -265,11 +304,21 @@ void IHM::mettreAJourCaissiers() {
             }
         }
     }
+    // Règle d'impatience :
+    // - Consultation (non urgente) : le client part s'il a attendu plus de N unités
+    // - Transfer & Withdraw (urgentes) : ne partent pas par impatience
+    const int patienceLimit = params.getClientPatienceTime();
     auto it = fileAttente.begin();
     while (it != fileAttente.end()) {
-        if (!(*it)->isPatient()) {  // isPatient() = patienceTime > 0 || operation->isUrgent()
-            (*it)->setDepartureTime(tempsActuel);
-            statisticManager->registerNonServedClient(*it);
+        const auto& client = *it;
+        const auto& op = client->getOperation();
+        const bool urgent = op.isUrgent();
+        const int waited = tempsActuel - client->getArrivalTime();
+
+        if (!urgent && waited > patienceLimit) {
+            // Consultation trop longue -> le client quitte la file
+            client->setDepartureTime(tempsActuel);
+            statisticManager->registerNonServedClient(client);
             it = fileAttente.erase(it);
         } else {
             ++it;

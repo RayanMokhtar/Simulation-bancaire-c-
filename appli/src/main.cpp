@@ -5,7 +5,7 @@
 #include "ihm/ihm.h"
 
 int main() {
-    const int CLIENT_ARRIVAL_INTERVAL = 1;
+    const int CLIENT_ARRIVAL_INTERVAL = 5;
     const int MAX_SERVICE_TIME = 20;
     const int MIN_SERVICE_TIME = 10;
     const int CASHIER_COUNT = 3;
