@@ -2,8 +2,12 @@
 #define STATISTIC_MANAGER_H
 
 #include <vector>
-#include <memory>  // Ajouté
+#include <memory>
+#include <map>        // Ajouté pour std::map
+#include <string>     // Ajouté pour std::string
 #include "client/AbstractClient.h"
+#include "persistence/DatabaseManager.h"  // Ajouté pour DatabaseManager
+#include "bank/Cashier.h"                 // Ajouté pour Cashier
 
 class StatisticManager {
 private:
@@ -24,6 +28,7 @@ public:
     int nonServedClientCount() const;
     double calculateClientSatisfactionRate() const;
     ~StatisticManager() = default;  // Pas de delete manuel
+    std::map<std::string, std::pair<int, double>> getOperationStats() const;
+    void saveToDatabase(int simulationId, DatabaseManager& dbManager, const std::vector<std::unique_ptr<Cashier>>& cashiers, const SimulationEntry& entry);  // Supprime StatisticManager::
 };
-
 #endif // STATISTIC_MANAGER_H

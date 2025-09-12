@@ -473,3 +473,167 @@ void IHM::afficher() {
         window.display();
     }
 }
+
+
+void drawPieSector(sf::RenderWindow& window, sf::Vector2f center, float radius, float startAngle, float endAngle, sf::Color color) {
+    sf::ConvexShape sector;
+    sector.setPointCount(32);  // Plus de points pour lisser
+    sector.setFillColor(color);
+    sector.setPosition(center);
+
+    float angleStep = (endAngle - startAngle) / 30.f;
+    sector.setPoint(0, sf::Vector2f(0.f, 0.f));  // Centre
+    for (int i = 1; i <= 31; ++i) {
+        float angle = startAngle + (i - 1) * angleStep;
+        float rad = angle * 3.14159265f / 180.f;
+        sector.setPoint(i, sf::Vector2f(radius * std::cos(rad), radius * std::sin(rad)));
+    }
+    window.draw(sector);
+}
+
+// Fonction pour dessiner une barre avec gradient
+void drawGradientBar(sf::RenderWindow& window, sf::Vector2f position, sf::Vector2f size, sf::Color topColor, sf::Color bottomColor) {
+    sf::RectangleShape bar(size);
+    bar.setPosition(position);
+    // Gradient simple : couleur moyenne
+    sf::Color midColor((topColor.r + bottomColor.r)/2, (topColor.g + bottomColor.g)/2, (topColor.b + bottomColor.b)/2);
+    bar.setFillColor(midColor);
+    window.draw(bar);
+
+    // Bordure
+    bar.setFillColor(sf::Color::Transparent);
+    bar.setOutlineThickness(2.f);
+    bar.setOutlineColor(sf::Color::Black);
+    window.draw(bar);
+}
+
+void IHM::displayGraphs(int totalServed, int totalDeparted, const std::map<int, double>& occupancyData) {
+    sf::RenderWindow window(sf::VideoMode(1000, 700), "Graphiques DB Améliorés");
+    sf::Font font;
+    bool haveFont = loadUiFont(font);
+    const sf::Font* fontPtr = haveFont ? &font : nullptr;
+
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) window.close();
+        }
+
+        window.clear(sf::Color(240, 248, 255));  // Fond bleu clair
+
+        // Titre
+        if (fontPtr) {
+            sf::Text title("Statistiques de Simulation", *fontPtr, 24);
+            title.setPosition(350.f, 20.f);
+            title.setFillColor(sf::Color::Black);
+            window.draw(title);
+        }
+
+        // Camembert (à gauche)
+        sf::Vector2f pieCenter(200.f, 200.f);
+        float pieRadius = 120.f;
+        if (totalServed + totalDeparted > 0) {
+            double servedPercent = (double)totalServed / (totalServed + totalDeparted) * 100;
+            double departedPercent = 100 - servedPercent;
+
+            // Secteur servis (vert)
+            drawPieSector(window, pieCenter, pieRadius, 0.f, servedPercent * 3.6f, sf::Color(34, 139, 34));  // Vert foncé
+
+            // Secteur partis (rouge)
+            drawPieSector(window, pieCenter, pieRadius, servedPercent * 3.6f, 360.f, sf::Color(220, 20, 60));  // Rouge
+
+            // Légende camembert
+            if (fontPtr) {
+                sf::Text legend1("Servis: " + std::to_string(servedPercent).substr(0, 4) + "%", *fontPtr, 16);
+                legend1.setPosition(50.f, 380.f);
+                legend1.setFillColor(sf::Color(34, 139, 34));
+                window.draw(legend1);
+
+                sf::Text legend2("Partis: " + std::to_string(departedPercent).substr(0, 4) + "%", *fontPtr, 16);
+                legend2.setPosition(50.f, 410.f);
+                legend2.setFillColor(sf::Color(220, 20, 60));
+                window.draw(legend2);
+            }
+        }
+
+        // Barres (à droite) avec axes et grille
+        float chartX = 500.f;
+        float chartY = 100.f;
+        float chartWidth = 400.f;
+        float chartHeight = 400.f;
+
+        // Axe Y (vertical)
+        sf::RectangleShape yAxis(sf::Vector2f(2.f, chartHeight));
+        yAxis.setPosition(chartX, chartY);
+        yAxis.setFillColor(sf::Color::Black);
+        window.draw(yAxis);
+
+        // Axe X (horizontal)
+        sf::RectangleShape xAxis(sf::Vector2f(chartWidth, 2.f));
+        xAxis.setPosition(chartX, chartY + chartHeight);
+        xAxis.setFillColor(sf::Color::Black);
+        window.draw(xAxis);
+
+        // Grille légère
+        for (int i = 0; i <= 10; ++i) {
+            float y = chartY + (chartHeight / 10) * i;
+            sf::RectangleShape gridLine(sf::Vector2f(chartWidth, 1.f));
+            gridLine.setPosition(chartX, y);
+            gridLine.setFillColor(sf::Color(200, 200, 200, 100));
+            window.draw(gridLine);
+        }
+
+        // Titre barres
+        if (fontPtr) {
+            sf::Text barTitle("Occupation par Caissier (%)", *fontPtr, 18);
+            barTitle.setPosition(chartX + 50.f, chartY - 40.f);
+            barTitle.setFillColor(sf::Color::Black);
+            window.draw(barTitle);
+        }
+
+        // Barres
+        int barCount = occupancyData.size();
+        float barWidth = chartWidth / (barCount * 2.f);
+        float spacing = barWidth;
+        int index = 0;
+        for (auto& data : occupancyData) {
+            float barHeight = (data.second / 100.f) * chartHeight;  // Échelle 0-100%
+            sf::Vector2f barPos(chartX + spacing + index * (barWidth + spacing), chartY + chartHeight - barHeight);
+            sf::Vector2f barSize(barWidth, barHeight);
+
+            // Gradient : bleu clair en haut, bleu foncé en bas
+            drawGradientBar(window, barPos, barSize, sf::Color(135, 206, 250), sf::Color(25, 25, 112));
+
+            // Label caissier
+            if (fontPtr) {
+                sf::Text label(std::to_string(data.first), *fontPtr, 12);
+                label.setPosition(barPos.x + barWidth / 4.f, chartY + chartHeight + 10.f);
+                label.setFillColor(sf::Color::Black);
+                window.draw(label);
+
+                // Valeur sur la barre
+                sf::Text value(std::to_string(data.second).substr(0, 4) + "%", *fontPtr, 10);
+                value.setPosition(barPos.x, barPos.y - 20.f);
+                value.setFillColor(sf::Color::White);
+                window.draw(value);
+            }
+            index++;
+        }
+
+        // Labels axes
+        if (fontPtr) {
+            sf::Text xLabel("Caissiers", *fontPtr, 14);
+            xLabel.setPosition(chartX + chartWidth / 2.f - 30.f, chartY + chartHeight + 30.f);
+            xLabel.setFillColor(sf::Color::Black);
+            window.draw(xLabel);
+
+            sf::Text yLabel("Occupation (%)", *fontPtr, 14);
+            yLabel.setPosition(chartX - 100.f, chartY + chartHeight / 2.f - 50.f);
+            yLabel.setRotation(-90.f);
+            yLabel.setFillColor(sf::Color::Black);
+            window.draw(yLabel);
+        }
+
+        window.display();
+    }
+}

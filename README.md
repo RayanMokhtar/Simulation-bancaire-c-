@@ -9,4 +9,7 @@ nouvelle compilation depuis split par dossiers  : g++ -std=c++14 -I include $(fi
 
 à exécuter directement depuis appli/ 
 
-Windows --> g++ -std=c++14 -I include -I "C:\SFML\include" `    (Get-ChildItem -Recurse -Filter *.cpp).FullName `    -L "C:\SFML\lib" -o simulation_gui.exe `    -lsfml-graphics -lsfml-window -lsfml-system
+
+
+avec bd : 
+g++ -std=c++14 -DWITH_PERSISTENCE -I include -I /usr/include/mysql $(find . -name "*.cpp") -o simulation_gui -lsfml-graphics -lsfml-window -lsfml-system -lmysqlclient
