@@ -64,4 +64,4 @@ public:
     void displayGraphs(int totalServed, int totalDeparted, const std::map<int, double>& occupancyData);  // Nouvelle déclaration
 };
 
-#endif // IHM_H
+#endif // IHM_Hs

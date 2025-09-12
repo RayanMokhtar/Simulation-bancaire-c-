@@ -13,7 +13,7 @@ int main() {
     const int SIMULATION_DURATION = 1000;
     const double PRIORITY_CLIENT_RATE = 0.9;
     const int CLIENT_PATIENCE_TIME = 7;
-    const std::string MODE_AFFICHAGE = "db_graph";  // Nouveau mode pour DB + graphiques
+    const std::string MODE_AFFICHAGE = "ihm";  // Nouveau mode pour DB + graphiques
 
     SimulationEntry entry(SIMULATION_DURATION, CASHIER_COUNT, MIN_SERVICE_TIME, MAX_SERVICE_TIME,
                           CLIENT_ARRIVAL_INTERVAL, PRIORITY_CLIENT_RATE, CLIENT_PATIENCE_TIME);
