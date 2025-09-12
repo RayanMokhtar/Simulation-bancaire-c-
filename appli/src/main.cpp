@@ -1,7 +1,8 @@
-#include "Simulation.h"
-#include "SimulationEntry.h"
-#include "ihm.h"
 #include <iostream>
+
+#include "simulation/Simulation.h"
+#include "simulation/SimulationEntry.h"
+#include "ihm/ihm.h"
 
 int main() {
     const int CLIENT_ARRIVAL_INTERVAL = 1;
