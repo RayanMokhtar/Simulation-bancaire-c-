@@ -34,6 +34,9 @@ struct ConfigurationSummary {
     double avgSatisfactionRate;
     double avgWaitingTime;
     double avgOccupationRate;
+    
+    // Constructeur par défaut
+    ConfigurationSummary() : id(0), entry(0,0,0,0,0,0.0,0), executionCount(0), avgSatisfactionRate(0.0), avgWaitingTime(0.0), avgOccupationRate(0.0) {}
 };
 
 class SimulationRepository {

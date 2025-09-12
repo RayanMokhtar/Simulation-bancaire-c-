@@ -24,7 +24,7 @@ void DatabaseConnection::initializeConnection() {
     }
     
     // Configuration des options de connexion
-    my_bool reconnect = 1;
+    bool reconnect = 1;
     mysql_options(connection, MYSQL_OPT_RECONNECT, &reconnect);
     
     // Timeout de connexion
@@ -33,6 +33,26 @@ void DatabaseConnection::initializeConnection() {
     
     // Charset UTF-8
     mysql_options(connection, MYSQL_SET_CHARSET_NAME, "utf8mb4");
+    
+    // Effectuer la connexion directement
+    MYSQL* result = mysql_real_connect(
+        connection, 
+        host.c_str(), 
+        username.c_str(), 
+        password.c_str(), 
+        database.c_str(), 
+        port, 
+        nullptr, 
+        CLIENT_MULTI_STATEMENTS
+    );
+    
+    if (result) {
+        connected = true;
+        std::cout << "Connected to MySQL database: " << database << std::endl;
+    } else {
+        std::cerr << "MySQL connection failed: " << mysql_error(connection) << std::endl;
+        throw DatabaseException("Failed to connect to MySQL: " + std::string(mysql_error(connection)));
+    }
 }
 
 bool DatabaseConnection::connect() {
@@ -142,7 +162,28 @@ bool DatabaseConnection::rollback() {
 }
 
 DatabaseConnection& DatabaseConnection::getInstance() {
-    static DatabaseConnection instance;
+    static bool initialized = false;
+    static DatabaseConnection instance = []() {
+        try {
+            DatabaseConfig config("config/database.conf");
+            if (!config.loadConfig()) {
+                std::cerr << "WARNING: Failed to load config file, using default values" << std::endl;
+                return DatabaseConnection();  // valeurs par défaut
+            }
+            
+            return DatabaseConnection(
+                config.getHost("database"),
+                config.getUsername("database"),
+                config.getPassword("database"),
+                config.getDatabase("database"),
+                config.getPort("database")
+            );
+        } catch (const std::exception& e) {
+            std::cerr << "WARNING: Error loading database config: " << e.what() << std::endl;
+            return DatabaseConnection();  // valeurs par défaut en cas d'erreur
+        }
+    }();
+    
     return instance;
 }
 

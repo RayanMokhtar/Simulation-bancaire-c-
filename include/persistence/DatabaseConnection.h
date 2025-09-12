@@ -6,7 +6,7 @@
 #include <stdexcept>
 
 #ifdef WITH_PERSISTENCE
-#include <mysql/mysql.h>
+#include <mysql.h>
 
 class DatabaseException : public std::runtime_error {
 public:

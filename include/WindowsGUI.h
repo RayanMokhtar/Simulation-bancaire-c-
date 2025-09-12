@@ -28,6 +28,8 @@ private:
 #ifdef WITH_PERSISTENCE
     std::unique_ptr<PersistenceManager> persistenceManager;
     bool persistenceEnabled;
+    int persistenceConfigId; // ID de configuration sauvegardée
+    bool hasSavedSimulation; // éviter double sauvegarde
     HWND hSaveConfig, hLoadConfig, hShowHistory;
 #endif
 

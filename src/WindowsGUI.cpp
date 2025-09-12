@@ -6,6 +6,12 @@
 #include <cwchar>
 #include <cstdlib>
 
+#ifdef WITH_PERSISTENCE
+#include "persistence/DatabaseConnection.h"
+#include "persistence/SimulationRepository.h"
+#include "persistence/DatabaseConfig.h"
+#endif
+
 #define ID_START 1001
 #define ID_PAUSE 1002
 #define ID_RESET 1003
@@ -23,7 +29,11 @@
 static std::wstring FormatFinalResultsFR_Direct(SimulationNew* sim);
 
 WindowsGUI::WindowsGUI() : hwnd(nullptr), simulation(nullptr), currentEntry(nullptr), 
-                           isRunning(false), currentTime  (0), maxTime(100) {
+                           isRunning(false), currentTime  (0), maxTime(100)
+#ifdef WITH_PERSISTENCE
+                           , persistenceEnabled(false), persistenceConfigId(-1), hasSavedSimulation(false)
+#endif
+{
 }
 
 WindowsGUI::~WindowsGUI() {
@@ -110,6 +120,18 @@ bool WindowsGUI::Initialize(HINSTANCE hInstance) {
     EnableWindow(hPause, FALSE);
     ShowWindow(hwnd, SW_SHOWDEFAULT);
     UpdateWindow(hwnd);
+
+#ifdef WITH_PERSISTENCE
+    // Initialiser la persistance à partir du fichier config
+    persistenceManager = std::make_unique<PersistenceManager>();
+    if (persistenceManager->initializeFromConfig("config/database.conf", "database")) {
+        persistenceEnabled = true;
+    } else {
+        persistenceEnabled = false;
+        // Optionnel : afficher dans le statut qu'on est en mode sans persistance
+        SetWindowTextW(hStatus, L"Persistance desactivee (config/DB) – simulation locale uniquement");
+    }
+#endif
     return true;
 }
 
@@ -133,6 +155,35 @@ void WindowsGUI::StartSimulation() {
     GetWindowTextW(hPatience, buffer, 100); int patience = _wtoi(buffer);
     currentEntry = std::make_unique<SimulationEntry>(duration, cashiers, interval, minService, maxService, vipRate, patience);
     simulation = std::make_unique<SimulationNew>(*currentEntry);
+#ifdef WITH_PERSISTENCE
+    hasSavedSimulation = false;
+    persistenceConfigId = -1;
+    if (persistenceEnabled && persistenceManager && persistenceManager->isInitialized()) {
+        // Sauvegarder la configuration (nom basique avec timestamp)
+        SYSTEMTIME st; GetLocalTime(&st);
+        wchar_t nameW[128];
+        swprintf(nameW, 128, L"GUI_%04d%02d%02d_%02d%02d%02d", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+        int wideLen = lstrlenW(nameW);
+        std::string nameUTF8;
+        if (wideLen > 0) {
+            int needed = WideCharToMultiByte(CP_UTF8, 0, nameW, -1, nullptr, 0, nullptr, nullptr);
+            if (needed > 0) {
+                nameUTF8.resize(needed - 1);
+                WideCharToMultiByte(CP_UTF8, 0, nameW, -1, &nameUTF8[0], needed, nullptr, nullptr);
+            }
+        } else {
+            nameUTF8 = "GUI_Run";
+        }
+
+        // Enregistrer la configuration et activer la persistance sur la simulation
+        persistenceConfigId = persistenceManager->saveSimulationConfiguration(nameUTF8, *currentEntry);
+        if (persistenceConfigId > 0) {
+            if (auto repo = persistenceManager->getRepository()) {
+                simulation->enablePersistence(repo);
+            }
+        }
+    }
+#endif
     currentTime = 0; maxTime = duration; isRunning = true;
     EnableWindow(hStart, FALSE); EnableWindow(hPause, TRUE); EnableWindow(hReset, TRUE);
     SetWindowTextW(hStatus, L"Simulation en cours...");
@@ -163,6 +214,16 @@ void WindowsGUI::RunStep() {
         SetWindowTextW(hStatus, L"Simulation terminee");
         std::wstring fr = FormatFinalResultsFR_Direct(simulation.get());
         SetWindowTextW(hResults, fr.c_str());
+
+#ifdef WITH_PERSISTENCE
+        // Sauvegarder les resultats si la persistance est activee et pas encore faite
+        if (!hasSavedSimulation && persistenceEnabled && persistenceManager && persistenceManager->isInitialized() && persistenceConfigId > 0) {
+            if (auto repo = persistenceManager->getRepository()) {
+                int simId = repo->saveSimulation(persistenceConfigId, simulation.get());
+                hasSavedSimulation = (simId > 0);
+            }
+        }
+#endif
         return;
     }
     simulation->step();
@@ -174,6 +235,15 @@ void WindowsGUI::RunStep() {
         SetWindowTextW(hStatus, L"Simulation terminee");
         isRunning = false; KillTimer(hwnd, ID_TIMER);
         EnableWindow(hStart, TRUE); EnableWindow(hPause, FALSE);
+
+#ifdef WITH_PERSISTENCE
+        if (!hasSavedSimulation && persistenceEnabled && persistenceManager && persistenceManager->isInitialized() && persistenceConfigId > 0) {
+            if (auto repo = persistenceManager->getRepository()) {
+                int simId = repo->saveSimulation(persistenceConfigId, simulation.get());
+                hasSavedSimulation = (simId > 0);
+            }
+        }
+#endif
     } else {
         UpdateDisplay();
     }

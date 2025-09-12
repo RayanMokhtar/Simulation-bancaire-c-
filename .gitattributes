@@ -1,0 +1,16 @@
+# Normalisation des fins de ligne par défaut (sûr multi-OS)
+* text=auto
+
+# Scripts
+*.ps1 text eol=crlf
+*.sh  text eol=lf
+
+# Sources: garder LF dans le repo
+*.c    text eol=lf
+*.cpp  text eol=lf
+*.h    text eol=lf
+*.hpp  text eol=lf
+*.md   text eol=lf
+
+# Tiers: ne pas toucher (pas de conversion EOL)
+third_party/** -text
