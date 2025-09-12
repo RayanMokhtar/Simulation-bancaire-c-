@@ -27,7 +27,7 @@ struct ClientDataIHM {
 };
 
 struct CaissierIHM {
-    int id;  // Index basé sur la liste
+    int id;  // Index basé sur la listes
     bool occupe;
     int tempsRestant;  // Estimation (pas accès direct)
     
