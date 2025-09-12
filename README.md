@@ -35,6 +35,8 @@ demo_cpp/
 2. **MySQL Server** (8.0 recommandé)
 3. **MySQL Connector/C++** pour la persistance
 
+Normalement pas besoin de les installer car fichiers nécéssaires déja présents dans third-party\mysql
+
 ### Dépendances MySQL locales (sans installation système)
 Vous pouvez compiler/faire tourner sans installer le Connector globalement. Placez simplement les fichiers nécessaires dans:
 
@@ -44,17 +46,17 @@ Vous pouvez compiler/faire tourner sans installer le Connector globalement. Plac
 
 Un aide-mémoire est disponible dans `third_party/mysql/README.txt`.
 
-### Version sans persistance MySQL
+## Version sans persistance MySQL
 
-# Compilation manuelle
+### Compilation manuelle
 g++ -std=c++17 -O2 -municode -DUNICODE -D_UNICODE -Wall -Wextra -pedantic main_gui_windows.cpp src/bank/Bank.cpp src/bank/Caissier.cpp src/bank/FileAttente.cpp src/simulation/SimulationNew.cpp src/simulation/SimulationUtility.cpp src/simulation/StatisticManager.cpp src/simulation/AbstractClient.cpp src/simulation/AbstractOperation.cpp src/client/ClientNew.cpp src/client/VIPClient.cpp src/client/Consultation.cpp src/client/Transfer.cpp src/client/Withdraw.cpp src/WindowsGUI.cpp -Iinclude -lgdi32 -luser32 -o simulation_gui_windows.exe
 
 
 .\simulation_gui_windows.exe
 
 
-### Version avec persistance MySQL
-# Build relatif (MinGW, Windows, GUI + MySQL) — aucun install MySQL requis
+## Version avec persistance MySQL
+### Compilation manuelle
 g++ -std=c++17 -DWITH_PERSISTENCE `
   -I"include" -I"third_party/mysql/include" `
   main_gui_windows.cpp src/WindowsGUI.cpp src/bank/*.cpp src/client/*.cpp src/simulation/*.cpp src/persistence/*.cpp `
@@ -64,12 +66,5 @@ g++ -std=c++17 -DWITH_PERSISTENCE `
 
 Copy-Item -Force "third_party/mysql/bin/libmysql.dll" ".\libmysql.dll"
 
-
-.\BankSimulation_MySQL.exe  
-
-
-Notes:
-- Le nom de la lib `-lmysql` suppose un fichier `libmysql.dll.a` dans `third_party/mysql/lib`. Si vous utilisez MariaDB, remplacez par `-lmariadb` et fournissez `libmariadb.dll.a`+`libmariadb.dll`.
-- L’EXE requiert la DLL au runtime (copie locale ou PATH).
 
 .\BankSimulation_MySQL.exe  
